@@ -30,6 +30,12 @@ if [ "x${IP}" = "x" ]; then
    exit 1;
 fi
 
+# Match the loopback address to the version of the provided IP address
+LOOPBACK=127.0.0.1
+echo "${IP}" | grep "\:" > /dev/null 2>&1
+if [ $? = 0 ]; then
+   LOOPBACK=::1
+fi
 
 # Adding the ip to null route
 if [ "x${ACTION}" = "xadd" ]; then
@@ -39,7 +45,7 @@ if [ "x${ACTION}" = "xadd" ]; then
   fi
 
   if [ "X${UNAME}" = "XFreeBSD" ]; then
-   route -q add ${IP} 127.0.0.1 -blackhole
+   route -q add ${IP} $LOOPBACK -blackhole
    exit 0;
   fi
 
@@ -52,7 +58,7 @@ elif [ "x${ACTION}" = "xdelete" ]; then
   fi
 
   if [ "X${UNAME}" = "XFreeBSD" ]; then
-   route -q delete ${IP} 127.0.0.1 -blackhole
+   route -q delete ${IP} $LOOPBACK -blackhole
    exit 0;
   fi
 
